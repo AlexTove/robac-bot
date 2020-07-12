@@ -9,7 +9,7 @@ import (
 )
 
 // Variables used for command line parameters
-const Token string = "NzMxMzkwMjU3MjQ4ODYyMjc4.Xwoq8w.FgS6svDElhlNndt9yjQ8I0tMPW8"
+const Token string = "NzMxMzkwMjU3MjQ4ODYyMjc4.XwsO0w.3MyAY7IPez1MimrgGWliAM52s-Y"
 
 func main() {
 
