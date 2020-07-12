@@ -49,6 +49,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
+
+	if len(m.Content) == 0 {
+		return
+	}
 	// If the message is "ping" reply with "Pong!"
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "Pong!")
@@ -69,12 +73,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if m.Content[0] == '$' {
-		strlen := len(m.Content)
+		content := m.Content
+		strlen := len(content)
 		command := ""
 
 		for i := 1; i < strlen; i++ {
-			if m.Content[i] != ' ' && m.Content[i] != '\n' {
-				command += string(m.Content[i])
+			if content[i] != ' ' && content[i] != '\n' {
+				command += string(content[i])
 			} else {
 				break
 			}
@@ -84,5 +89,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == ".ban baciu" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "Nu pot sefu ca e owner")
+	}
+
+	if m.Content == "jokes" {
+		_, _ = s.ChannelMessageSend("731435127770578999", "sugeti pula")
 	}
 }
