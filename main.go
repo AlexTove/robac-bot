@@ -51,34 +51,38 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	// If the message is "ping" reply with "Pong!"
 	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}
 
 	// If the message is "pong" reply with "Ping!"
 	if m.Content == "pong" {
-		s.ChannelMessageSend(m.ChannelID, "Ping!")
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Ping!")
 	}
 
 	//If the message is "Hello" reply back
 	if m.Content == "Hello" {
-		s.ChannelMessageSend(m.ChannelID, "Hello, " + m.Author.Mention() + "!")
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Hello, " + m.Author.Mention()+"!")
 	}
 
 	if m.Content == "Sugi pula" {
-		s.ChannelMessageSend(m.ChannelID, "Te bag eu in pizda ma-tii bai " + m.Author.Mention())
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Te bag eu in pizda ma-tii bai " + m.Author.Mention())
 	}
 
-	if(m.Content[0] == '$') {
+	if m.Content[0] == '$' {
 		strlen := len(m.Content)
 		command := ""
 
-		for i := 1; i != strlen; i++{
+		for i := 1; i < strlen; i++ {
 			if m.Content[i] != ' ' && m.Content[i] != '\n' {
 				command += string(m.Content[i])
 			} else {
 				break
 			}
 		}
-		s.ChannelMessageSend(m.ChannelID, command)
+		_, _ = s.ChannelMessageSend(m.ChannelID, command)
+	}
+
+	if m.Content == ".ban baciu" {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Nu pot sefu ca e owner")
 	}
 }
