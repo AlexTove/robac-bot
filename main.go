@@ -5,10 +5,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 )
 
-// Variables used for command line parameters
+
 const Token string = "NzMxMzkwMjU3MjQ4ODYyMjc4.XwsO0w.3MyAY7IPez1MimrgGWliAM52s-Y"
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 	<-sc
 
 	// Cleanly close down the Discord session.
-	dg.Close()
+	_ = dg.Close()
 }
 
 // This function will be called (due to AddHandler above) every time a new
@@ -45,53 +46,21 @@ func main() {
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
 
+	// Ignore all empty messages
 	if len(m.Content) == 0 {
 		return
 	}
-	// If the message is "ping" reply with "Pong!"
-	if m.Content == "ping" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Pong!")
-	}
-
-	// If the message is "pong" reply with "Ping!"
-	if m.Content == "pong" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Ping!")
-	}
-
-	//If the message is "Hello" reply back
-	if m.Content == "Hello" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Hello, " + m.Author.Mention()+"!")
-	}
-
-	if m.Content == "Sugi pula" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Te bag eu in pizda ma-tii bai " + m.Author.Mention())
-	}
 
 	if m.Content[0] == '$' {
-		content := m.Content
-		strlen := len(content)
-		command := ""
+		var cmd string
 
-		for i := 1; i < strlen; i++ {
-			if content[i] != ' ' && content[i] != '\n' {
-				command += string(content[i])
-			} else {
-				break
-			}
-		}
-		_, _ = s.ChannelMessageSend(m.ChannelID, command)
-	}
-
-	if m.Content == ".ban baciu" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Nu pot sefu ca e owner")
-	}
-
-	if m.Content == "jokes" {
-		_, _ = s.ChannelMessageSend("731435127770578999", "sugeti pula")
+		r := strings.NewReader(m.Content)
+		_, _ = fmt.Fscanf(r, "$%s", cmd)
+		fmt.Print(cmd + "\n")
+		_, _ = s.ChannelMessageSend(m.ChannelID, cmd)
 	}
 }
