@@ -1,0 +1,5 @@
+# Ignore IDE folders
+.idea/
+
+# Ignore all .mod files
+*.mod
