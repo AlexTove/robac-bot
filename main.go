@@ -7,15 +7,36 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"io/ioutil"
+	"encoding/json"
 )
 
 
-const Token string = "NzMxMzkwMjU3MjQ4ODYyMjc4.XwsO0w.3MyAY7IPez1MimrgGWliAM52s-Y"
-
 func main() {
 
+	// Read the configuration from files.
+	jsonFile, err := os.Open("config.json")
+	if err != nil {
+		fmt.Println("Could not open config file,", err)
+		return
+	}
+
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		fmt.Println("Could not read config file,", err)
+		return
+	}
+
+	// Parse JSON and get the bot token.
+	var configs map[string]interface{}
+	json.Unmarshal([]byte(bytes), &configs)
+
+	bot_token := configs["bot_token"].(string)
+
+	jsonFile.Close()
+
 	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + Token)
+	dg, err := discordgo.New("Bot " + bot_token)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
