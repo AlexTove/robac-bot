@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"io"
 	"os"
 	"os/signal"
 	"strings"
@@ -65,7 +64,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		r := strings.NewReader(m.Content)
 		_, _ = fmt.Fscanf(r, "$%s", &cmd)
 
-		message = processCommand(r, cmd)
+		message = processCommand(s, m, r, &cmd)
 
 		if len(message) != 0 {
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
@@ -73,11 +72,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func processCommand(r io.Reader, cmd string) string{
-	switch cmd {
+func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Reader, cmd *string) string{
+	switch *cmd {
 	case "Baciu":
 		return "E cam gay"
+	case "kick":
+
 	default:
 		return ""
 	}
+
+	return ""
 }
