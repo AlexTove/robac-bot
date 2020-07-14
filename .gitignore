@@ -1,5 +1,8 @@
 # Ignore IDE folders
 .idea/
 
+# Ignore the configuration
+config.json
+
 # Ignore all .mod files
 *.mod

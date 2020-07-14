@@ -93,13 +93,27 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 	case "Baciu":
 		_, _ = s.ChannelMessageSend(m.ChannelID, "E cam gay")
 	case "kick":
+		userPermission, _ := s.UserChannelPermissions(m.Author.ID, m.ChannelID)
+
+		if userPermission & discordgo.PermissionBanMembers == 0 {
+			return
+		}
+
 		var userid string
+
 		_, _ = fmt.Fscanf(r, " <@!%s>", &userid)
+
+		if len(userid) == 0 {
+			return
+		}
+
 		userid = string([]rune(userid)[:len(userid) - 1])
+
 		fmt.Println(userid)
+
 		privateChannel, _ := s.UserChannelCreate(userid)
 		_, _ = s.ChannelMessageSend(privateChannel.ID, "Sugi pula, Baciule")
 		_ = s.GuildMemberDelete(m.GuildID, userid)
-		s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" + "Good job! You kicked a member!")
+		s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" + " Good job! You kicked a member!")
 	}
 }
