@@ -1,14 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"io"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
-	"io/ioutil"
-	"encoding/json"
 )
 
 
@@ -29,11 +30,11 @@ func main() {
 
 	// Parse JSON and get the bot token.
 	var configs map[string]interface{}
-	json.Unmarshal([]byte(bytes), &configs)
+	_ = json.Unmarshal([]byte(bytes), &configs)
 
 	bot_token := configs["bot_token"].(string)
 
-	jsonFile.Close()
+	_ = jsonFile.Close()
 
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + bot_token)
@@ -92,6 +93,7 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 	switch *cmd {
 	case "Baciu":
 		_, _ = s.ChannelMessageSend(m.ChannelID, "E cam gay")
+
 	case "kick":
 		userPermission, _ := s.UserChannelPermissions(m.Author.ID, m.ChannelID)
 
@@ -99,9 +101,9 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 			return
 		}
 
-		var userid string
+		var userid, reason string
 
-		_, _ = fmt.Fscanf(r, " <@!%s>", &userid)
+		_, _ = fmt.Fscanf(r, " <@!%s", &userid)
 
 		if len(userid) == 0 {
 			return
@@ -111,9 +113,23 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 
 		fmt.Println(userid)
 
+		buf := new(strings.Builder)
+		_, _ = io.Copy(buf, r)
+
+		if len(buf.String()) == 0 {
+			reason = "No reason was given."
+		} else {
+			reason = buf.String()
+		}
+
 		privateChannel, _ := s.UserChannelCreate(userid)
-		_, _ = s.ChannelMessageSend(privateChannel.ID, "Sugi pula, Baciule")
+		_, _ = s.ChannelMessageSend(privateChannel.ID, "You have been kicked from the server.\n" +
+			"Reason: " + reason + "\n" +
+			"Author: " + m.Author.Username)
+
 		_ = s.GuildMemberDelete(m.GuildID, userid)
-		s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" + " Good job! You kicked a member!")
+
+		_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
+			" Good job! You kicked a member!")
 	}
 }
