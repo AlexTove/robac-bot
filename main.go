@@ -6,8 +6,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 )
@@ -97,21 +99,26 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 	case "kick":
 		userPermission, _ := s.UserChannelPermissions(m.Author.ID, m.ChannelID)
 
-		if userPermission & discordgo.PermissionBanMembers == 0 {
+		if userPermission & discordgo.PermissionKickMembers == 0 ||
+			userPermission & discordgo.PermissionAdministrator == 0 {
 			return
 		}
 
 		var userid, reason string
 
-		_, _ = fmt.Fscanf(r, " <@!%s", &userid)
+		_, _ = fmt.Fscanf(r, " %s", &userid)
+
+		reg, err := regexp.Compile("[^0-9]+")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		userid = reg.ReplaceAllString(userid, "")
 
 		if len(userid) == 0 {
 			return
 		}
-
-		userid = string([]rune(userid)[:len(userid) - 1])
-
-		fmt.Println(userid)
 
 		buf := new(strings.Builder)
 		_, _ = io.Copy(buf, r)
@@ -122,14 +129,35 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 			reason = buf.String()
 		}
 
-		privateChannel, _ := s.UserChannelCreate(userid)
-		_, _ = s.ChannelMessageSend(privateChannel.ID, "You have been kicked from the server.\n" +
+		err = s.GuildMemberDelete(m.GuildID, userid)
+
+		if userid == m.Author.ID {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
+				" You can't kick yourself!")
+			return
+		}
+
+		if err != nil {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
+				" You can't kick that user!")
+			return
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
+				" User kicked successfully!")
+		}
+
+		privateChannel, err := s.UserChannelCreate(userid)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		_, err = s.ChannelMessageSend(privateChannel.ID, "You have been kicked from the server.\n" +
 			"Reason: " + reason + "\n" +
 			"Author: " + m.Author.Username)
 
-		_ = s.GuildMemberDelete(m.GuildID, userid)
-
-		_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
-			" Good job! You kicked a member!")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
