@@ -58,29 +58,27 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content[0] == '$' {
 		var (
 			cmd string
-			message string
 		)
 
 		r := strings.NewReader(m.Content)
 		_, _ = fmt.Fscanf(r, "$%s", &cmd)
 
-		message = processCommand(s, m, r, &cmd)
-
-		if len(message) != 0 {
-			_, _ = s.ChannelMessageSend(m.ChannelID, message)
-		}
+		processCommand(s, m, r, &cmd)
 	}
 }
 
-func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Reader, cmd *string) string{
+func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Reader, cmd *string) {
 	switch *cmd {
 	case "Baciu":
-		return "E cam gay"
+		_, _ = s.ChannelMessageSend(m.ChannelID, "E cam gay")
 	case "kick":
-
-	default:
-		return ""
+		var userid string
+		_, _ = fmt.Fscanf(r, " <@!%s>", &userid)
+		userid = string([]rune(userid)[:len(userid) - 1])
+		fmt.Println(userid)
+		privateChannel, _ := s.UserChannelCreate(userid)
+		_, _ = s.ChannelMessageSend(privateChannel.ID, "Sugi pula, Baciule")
+		_ = s.GuildMemberDelete(m.GuildID, userid)
+		s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" + "Good job! You kicked a member!")
 	}
-
-	return ""
 }
