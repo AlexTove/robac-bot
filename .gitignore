@@ -1,8 +1,9 @@
 # Ignore IDE folders
 .idea/
+Makefile
 
 # Ignore the configuration
 config.json
 
-# Ignore all .mod files
-*.mod
+# Ignore output folder
+output/
