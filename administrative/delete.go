@@ -7,7 +7,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func bulkDelete(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Reader) {
+func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Reader) {
 
 	var msgCount int
 
