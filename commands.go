@@ -7,7 +7,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// The route function for commands, from where the command functions are executed
+// The route function for commands, from where the command functions are executed.
 func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Reader, cmd *string) {
 	switch *cmd {
 	case "Baciu":
