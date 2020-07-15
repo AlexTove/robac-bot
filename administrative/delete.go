@@ -2,6 +2,7 @@ package administrative
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -13,8 +14,15 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Rea
 
 	fmt.Fscanf(r, " %d", &msgCount)
 
-	messages, _ := s.ChannelMessages(m.ChannelID, msgCount, "", "", "")
+	msgCount++
 
+	messages, err := s.ChannelMessages(m.ChannelID, msgCount, "", "", "")
+
+	if err != nil {
+		fmt.Println("CH MSG")
+		log.Println(err)
+
+	}
 	messagesID := make([]string, msgCount)
 
 	if len(messages) < msgCount {
@@ -23,8 +31,14 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Rea
 
 	for i := 0; i < msgCount; i++ {
 		messagesID[i] = messages[i].ID
+		fmt.Println(messages[i].ID)
 	}
 
-	s.ChannelMessagesBulkDelete(m.ChannelID, messagesID)
+	err = s.ChannelMessagesBulkDelete(m.ChannelID, messagesID)
 
+	if err != nil {
+		fmt.Println("BLK DEL MSG")
+		log.Println(err)
+
+	}
 }
