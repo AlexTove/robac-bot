@@ -2,8 +2,8 @@
 .idea/
 Makefile
 
-# Ignore the configuration
-config.json
+# Ignore the configuration files
+*.json
 
 # Ignore output folder
 output/
