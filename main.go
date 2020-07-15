@@ -76,6 +76,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// Check for the bot-specific command prefix
 	if m.Content[0] == '$' {
 		var (
 			cmd string

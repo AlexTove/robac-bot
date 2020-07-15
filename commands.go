@@ -3,10 +3,11 @@ package main
 import (
 	"strings"
 	"github.com/bwmarrin/discordgo"
+// Command packages will be inserted below this line
 	"github.com/adriangeorge/robac-bot/administrative"
 )
 
-// The route function for commands, from where the command functions are executed
+// The route function for commands, from where the command functions are executed.
 func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Reader, cmd *string) {
 	switch *cmd {
 	case "Baciu":
