@@ -31,12 +31,12 @@ func main() {
 	var configs map[string]interface{}
 	_ = json.Unmarshal([]byte(bytes), &configs)
 
-	bot_token := configs["bot_token"].(string)
+	botToken := configs["botToken"].(string)
 
 	_ = jsonFile.Close()
 
 	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + bot_token)
+	dg, err := discordgo.New("Bot " + botToken)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
