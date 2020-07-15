@@ -2,8 +2,9 @@ package main
 
 import (
 	"strings"
-	"github.com/bwmarrin/discordgo"
+
 	"github.com/adriangeorge/robac-bot/administrative"
+	"github.com/bwmarrin/discordgo"
 )
 
 // The route function for commands, from where the command functions are executed
@@ -14,5 +15,9 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 
 	case "kick":
 		administrative.KickCommand(s, m, r)
+
+	case "delete":
+		administrative.BulkDelete(s, m, r)
 	}
+
 }
