@@ -1,7 +1,6 @@
 # RobacBOT
 
 RobacBOT is a discord bot built in Golang. The planned structure allows a package-based design for adding new commands to the bot, without modifying too much in the core code.
-TEST
 
 ## Getting Started
 
