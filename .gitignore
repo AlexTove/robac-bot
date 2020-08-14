@@ -10,3 +10,4 @@ output/
 
 # Ignore executable
 /robac-bot.exe
+*.json
