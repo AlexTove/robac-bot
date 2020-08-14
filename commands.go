@@ -1,9 +1,9 @@
 package main
 
 import (
-	"strings"
 	"github.com/bwmarrin/discordgo"
-// Command packages will be inserted below this line
+	"strings"
+	// Command packages will be inserted below this line
 	"github.com/adriangeorge/robac-bot/administrative"
 )
 
@@ -14,6 +14,6 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 		_, _ = s.ChannelMessageSend(m.ChannelID, "E cam gay")
 
 	case "kick":
-		administrative.KickCommand(s, m, r)
+		go administrative.KickCommand(s, m, r)
 	}
 }

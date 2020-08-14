@@ -1,11 +1,12 @@
 package administrative
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"regexp"
-	"log"
 	"io"
+	"log"
+	"regexp"
 	"strings"
 )
 
@@ -21,8 +22,8 @@ func KickCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Re
 	userPermission, _ := s.UserChannelPermissions(m.Author.ID, m.ChannelID)
 
 	// Verify the user's permissions
-	if userPermission & discordgo.PermissionKickMembers == 0 ||
-		userPermission & discordgo.PermissionAdministrator == 0 {
+	if userPermission&discordgo.PermissionKickMembers == 0 &&
+		userPermission&discordgo.PermissionAdministrator == 0 {
 		return
 	}
 
@@ -41,7 +42,6 @@ func KickCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Re
 	if len(userid) == 0 {
 		return
 	}
-
 	// Check for the second argument
 	buf := new(strings.Builder)
 	_, _ = io.Copy(buf, r)
@@ -52,37 +52,59 @@ func KickCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Re
 		reason = buf.String()
 	}
 
-	// Attempt to kick the user
-	err = s.GuildMemberDelete(m.GuildID, userid)
-
 	if userid == m.Author.ID {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
+		_, _ = s.ChannelMessageSend(m.ChannelID, "("+m.Author.Username+")"+
 			" You can't kick yourself!")
 		return
 	}
 
+	_, err = s.GuildMember(m.GuildID, userid)
+
 	if err != nil {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
+		_, _ = s.ChannelMessageSend(m.ChannelID, "("+m.Author.Username+")"+
+			" You must provide a valid userID!")
+		return
+	}
+
+	kickedUserPermission, _ := s.UserChannelPermissions(userid, m.ChannelID)
+
+	if kickedUserPermission&discordgo.PermissionKickMembers != 0 {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "("+m.Author.Username+")"+
 			" You can't kick that user!")
 		return
 	} else {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "(" + m.Author.Username + ")" +
+		// Send a private message to the user
+		privateChannel, _ := s.UserChannelCreate(userid)
+
+		_, err = s.ChannelMessageSend(privateChannel.ID, "You have been kicked from the server.\n"+
+			"Reason: "+reason+"\n"+
+			"Author: "+m.Author.Username)
+
+		_, _ = s.ChannelMessageSend(m.ChannelID, "("+m.Author.Username+")"+
 			" User kicked successfully!")
-		// TODO: add DB info here
-	}
 
-	// Send a private message to the user
-	privateChannel, err := s.UserChannelCreate(userid)
+		_ = s.GuildMemberDelete(m.GuildID, userid)
+
+		db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/robacbot")
+
+		if err != nil {
+			panic(err)
+		}
+
+		defer db.Close()
+
+		query := "INSERT INTO kicklog (kickedUserID, kickedByUserID, reason) VALUES (?, ?, ?)"
+		insert, err := db.Query(query, userid, m.Author.ID, reason)
+
+		if err != nil {
+			panic(err)
+		}
+
+		insert.Close()
+	}
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = s.ChannelMessageSend(privateChannel.ID, "You have been kicked from the server.\n" +
-		"Reason: " + reason + "\n" +
-		"Author: " + m.Author.Username)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 }

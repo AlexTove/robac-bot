@@ -7,3 +7,4 @@ Makefile
 
 # Ignore output folder
 output/
+/robac-bot.exe

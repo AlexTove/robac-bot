@@ -11,7 +11,7 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Rea
 
 	var msgCount int
 
-	fmt.Fscanf(r, " %d", &msgCount)
+	_, _ = fmt.Fscanf(r, " %d", &msgCount)
 
 	messages, _ := s.ChannelMessages(m.ChannelID, msgCount, "", "", "")
 
@@ -25,6 +25,6 @@ func BulkDelete(s *discordgo.Session, m *discordgo.MessageCreate, r *strings.Rea
 		messagesID[i] = messages[i].ID
 	}
 
-	s.ChannelMessagesBulkDelete(m.ChannelID, messagesID)
+	_ = s.ChannelMessagesBulkDelete(m.ChannelID, messagesID)
 
 }

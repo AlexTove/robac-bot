@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	_ "github.com/go-sql-driver/mysql"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -11,9 +12,7 @@ import (
 	"syscall"
 )
 
-
 func main() {
-
 	// Read the configuration from files.
 	jsonFile, err := os.Open("config.json")
 	if err != nil {
@@ -29,7 +28,7 @@ func main() {
 
 	// Parse JSON and get the bot token.
 	var configs map[string]interface{}
-	_ = json.Unmarshal([]byte(bytes), &configs)
+	_ = json.Unmarshal(bytes, &configs)
 
 	botToken := configs["botToken"].(string)
 
