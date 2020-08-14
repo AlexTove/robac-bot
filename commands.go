@@ -14,10 +14,10 @@ func processCommand(s *discordgo.Session, m *discordgo.MessageCreate, r *strings
 		_, _ = s.ChannelMessageSend(m.ChannelID, "E cam gay")
 
 	case "kick":
-		administrative.KickCommand(s, m, r)
+		go administrative.KickCommand(s, m, r)
 
 	case "delete":
-		administrative.BulkDelete(s, m, r)
+		go administrative.BulkDelete(s, m, r)
 	}
 
 }

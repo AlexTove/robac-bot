@@ -7,5 +7,6 @@ Makefile
 
 # Ignore output folder
 output/
+
+# Ignore executable
 /robac-bot.exe
-config.json

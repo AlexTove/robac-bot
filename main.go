@@ -28,27 +28,6 @@ func main() {
 
 	// Parse JSON and get the bot token.
 	var configs map[string]interface{}
-	_ = json.Unmarshal(bytes, &configs)
-
-	botToken := configs["botToken"].(string)
-
-	_ = jsonFile.Close()
-
-	// Read the configuration from files.
-	jsonFile, err := os.Open("config.json")
-	if err != nil {
-		fmt.Println("Could not open config file,", err)
-		return
-	}
-
-	bytes, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		fmt.Println("Could not read config file,", err)
-		return
-	}
-
-	// Parse JSON and get the bot token.
-	var configs map[string]interface{}
 	_ = json.Unmarshal([]byte(bytes), &configs)
 
 	botToken := configs["botToken"].(string)
